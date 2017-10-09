@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.destroyer.aplikasi_katalog_perpustakaan_smk_pgri_3">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/logo_perpus"
+        android:label="@string/app_name2"
+        android:screenOrientation="portrait"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MenuActivity"
+            android:label="APLIKASI KATALOG PERPUSTAKAAN" />
+        <activity android:name=".DaftarActivity" />
+        <activity android:name=".DetailActivity" />
+        <activity android:name=".ProfilActivity" />
+        <activity android:name=".RiwayatActivity" />
+        <activity android:name=".DetailActivity2" />
+        <activity android:name=".PinjamActivity"></activity>
+    </application>
+
+</manifest>
