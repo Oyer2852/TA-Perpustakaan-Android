@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -66,30 +65,19 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
         Intent intent = getIntent();
         id = intent.getStringExtra("id_buku");
-//        gambar = intent.getStringExtra("gambar_buku");
-/*
-        editTextId = (EditText) findViewById(R.id.editTextId);
-*/
-        imgbuku = (ImageView) findViewById(R.id.imgbuku);
+        gambar = intent.getStringExtra("gambar_buku");
+        imgbuku = (ImageView) findViewById(R.id.gambar_buku);
         judul_buku  = (EditText) findViewById(R.id.kota_buku);
         jilid_buku  = (EditText) findViewById(R.id.penerbit_buku);
         edisi_buku  = (EditText) findViewById(R.id.tahun_buku);
-//        isbn_buku   = (EditText) findViewById(R.id.isbn_buku);
-//        bahasa_buku = (EditText) findViewById(R.id.bahasa_buku);
+        getEmployee();
 
-/*
-        Glide.with(context)
+        Glide.with(this)
                 .load("http://10.0.2.2/KAPER_SKARIGA/img/book/" + gambar)
                 .crossFade()
                 .placeholder(R.mipmap.ic_launcher)
-                .into(holder.imgbuku);
-*/
+                .into(imgbuku);
 
-/*
-        judul_buku.setText(id);
-        editTextId.setText(id);
-*/
-        getEmployee();
 
 
         // Menginisiasi Toolbar dan mensetting sebagai actionbar
@@ -171,6 +159,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                         JSONObject json = jsonArray.getJSONObject(a);
                         HashMap<String, String> map = new HashMap<String, String>();
                         map.put("id", json.getString("id_buku"));
+                        map.put("id_detail_buku", json.getString("id_detail_buku"));
                         map.put("kode",json.getString("kode_buku"));
                         map.put("stat",json.getString("status_buku"));
                         map.put("gambar",json.getString("gambar_buku"));
@@ -200,7 +189,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         finish();
     }
     private void setprofil(){
-        Intent intent = new Intent(DetailActivity.this, ProfilActivity.class);
+        Intent intent = new Intent(DetailActivity.this, BuktiPesan.class);
         startActivity(intent);
         finish();
     }
@@ -293,16 +282,9 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 String jilid = c.getString(AppVar.TAG_PENERBIT);
                 String edisi = c.getString(AppVar.TAG_TAHUN);
 
-//                String bahasa= c.getString(AppVar.TAG_Bahasa);
-
-    /*
-                editTextId.setText(id);
-    */
                 judul_buku.setText(judul);
                 jilid_buku.setText(jilid);
                 edisi_buku.setText(edisi);
-//                isbn_buku.setText(isbn);
-//                bahasa_buku.setText(bahasa);
 
             } catch (JSONException e) {
                 e.printStackTrace();

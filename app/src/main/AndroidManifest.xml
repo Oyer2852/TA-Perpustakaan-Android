@@ -23,12 +23,14 @@
         <activity
             android:name=".MenuActivity"
             android:label="APLIKASI KATALOG PERPUSTAKAAN" />
-        <activity android:name=".DaftarActivity" />
+        <!--<activity android:name=".DaftarActivity" />-->
         <activity android:name=".DetailActivity" />
-        <activity android:name=".ProfilActivity" />
+        <activity android:name=".BuktiPesan" />
         <activity android:name=".RiwayatActivity" />
         <activity android:name=".DetailActivity2" />
-        <activity android:name=".PinjamActivity"></activity>
+        <activity android:name=".PinjamActivity" />
+        <activity android:name=".Daftar" />
+        <activity android:name=".Profil"></activity>
     </application>
 
 </manifest>

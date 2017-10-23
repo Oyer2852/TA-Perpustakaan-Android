@@ -1,11 +1,13 @@
 package com.example.destroyer.aplikasi_katalog_perpustakaan_smk_pgri_3;
 
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.AppCompatButton;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -16,6 +18,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +32,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editTextPassword;
     private Context context;
     private AppCompatButton buttonLogin;
-//    private AppCompatButton buttonDaftar;
+    private AppCompatButton buttonDaftar;
     private ProgressDialog pDialog;
+    SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +43,12 @@ public class LoginActivity extends AppCompatActivity {
         context = LoginActivity.this;
 
         //Initializing views
+        sessionManager = new SessionManager(getApplicationContext());
         pDialog = new ProgressDialog(context);
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         buttonLogin = (AppCompatButton) findViewById(R.id.buttonLogin);
-//        buttonDaftar = (AppCompatButton) findViewById(R.id.buttondaftar);
+        buttonDaftar = (AppCompatButton) findViewById(R.id.btnDaftar);
 
         //Adding click listener
         buttonLogin.setOnClickListener(new View.OnClickListener() {
@@ -48,15 +57,14 @@ public class LoginActivity extends AppCompatActivity {
                 login();
             }
         });
-//        buttonDaftar.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(LoginActivity.this, DaftarActivity.class);
-//                LoginActivity.this.startActivity(intent);
-//                LoginActivity.this.finish();
-//
-//            }
-//        });
+        buttonDaftar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent viewIntent = new Intent(LoginActivity.this,Daftar.class);
+                startActivity(viewIntent);
+
+            }
+        });
     }
     private void login() {
         //Getting values from edit texts
@@ -65,20 +73,20 @@ public class LoginActivity extends AppCompatActivity {
         pDialog.setMessage("Login Process...");
         showDialog();
         //Creating a string request
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, AppVar.LOGIN_URL,
+        /*StringRequest stringRequest = new StringRequest(Request.Method.POST, AppVar.LOGIN_URL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-
                         //If we are getting success from server
-                        if (response.contains(AppVar.LOGIN_SUCCESS)) {
+
+                        if(!response.contains("no")){
+                            sessionManager.createSession(response,"OKIR","okir@gmail.com");
                             hideDialog();
                             gotoMenuActivity();
-
                         } else {
                             hideDialog();
                             //Displaying an error message on toast
-                            Toast.makeText(context, "Username dan Password Salah", Toast.LENGTH_LONG).show();
+                           Toast.makeText(context, "Username atau Password Salah", Toast.LENGTH_LONG).show();
                         }
                     }
                 },
@@ -88,7 +96,6 @@ public class LoginActivity extends AppCompatActivity {
                         //You can handle error here if you want
                         hideDialog();
                         Toast.makeText(context, "Cek URL Koneksi nya", Toast.LENGTH_LONG).show();
-
                     }
                 }) {
             @Override
@@ -102,7 +109,42 @@ public class LoginActivity extends AppCompatActivity {
                 return params;
             }
         };
+*/
 
+        String url = "http://10.0.2.2/KAPER_SKARIGA_konek/login.php?email="+email+"&password="+password;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d("response", response);
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("result");
+                    for (int a = 0; a < jsonArray.length(); a++) {
+                        JSONObject json = jsonArray.getJSONObject(a);
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        String id_user = json.getString("id_user");
+                        String sp_id = json.getString("id_siswa_pegawai");
+                        String username = json.getString("username");
+                        String email = json.getString("email");
+
+                        sessionManager.createSession(id_user,username,email,sp_id);
+                        hideDialog();
+                        gotoMenuActivity();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    hideDialog();
+                    //Displaying an error message on toast
+                    Toast.makeText(context, "Username atau Password Salah", Toast.LENGTH_LONG).show();
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
         //Adding the string request to the queue
         Volley.newRequestQueue(this).add(stringRequest);
 

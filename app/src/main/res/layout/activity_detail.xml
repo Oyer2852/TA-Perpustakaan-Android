@@ -21,22 +21,14 @@
         <include
             android:id="@+id/toolbar"
             layout="@layout/layout_toolbar" />
-<!--
-        <EditText
-            android:id="@+id/editTextId"
+
+        <ImageView
+            android:id="@+id/gambar_buku"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/edittext_top_bg"
-            android:padding="5dp"
-            android:alpha="0.7"
-            android:hint="ID Buku-Buku"
-            android:fontFamily="monochrome"
-            android:textColorHint="#555555"
-            android:inputType="textPersonName"
-            android:textColor="#000000"
-            android:enabled="false"
-            />
--->
+            android:layout_height="319dp"
+            android:layout_gravity="center"
+            android:src="@mipmap/ic_launcher" />
+
         <EditText
             android:id="@+id/kota_buku"
             android:layout_width="match_parent"
@@ -79,35 +71,6 @@
             android:textColor="#000000"
             android:enabled="false"
             />
-        <!--<EditText-->
-            <!--android:id="@+id/isbn_buku"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@drawable/edittext_top_bg"-->
-            <!--android:padding="5dp"-->
-            <!--android:alpha="0.7"-->
-            <!--android:hint="Biografi"-->
-            <!--android:fontFamily="monochrome"-->
-            <!--android:textColorHint="#555555"-->
-            <!--android:inputType="textPersonName"-->
-            <!--android:textColor="#000000"-->
-            <!--android:enabled="false"-->
-            <!--/>-->
-        <!--<EditText-->
-            <!--android:id="@+id/bahasa_buku"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@drawable/edittext_top_bg"-->
-            <!--android:padding="5dp"-->
-            <!--android:alpha="0.7"-->
-            <!--android:hint="Bahasa Buku"-->
-            <!--android:fontFamily="monochrome"-->
-            <!--android:textColorHint="#555555"-->
-            <!--android:inputType="textPersonName"-->
-            <!--android:textColor="#000000"-->
-            <!--android:enabled="false"-->
-            <!--/>-->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

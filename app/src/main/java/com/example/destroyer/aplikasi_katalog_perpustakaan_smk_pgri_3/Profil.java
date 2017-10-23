@@ -5,56 +5,56 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PinjamActivity extends AppCompatActivity {
-    //Mendefinisikan variabel
-    private Toolbar toolbar;
-    private RecyclerView lvhapee4;
+public class Profil extends AppCompatActivity {
+
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
-    private StringRequest stringRequest;
-    private RequestQueue requestQueue;
-    ArrayList<HashMap<String, String>> list_data4;
+    private Toolbar toolbar;
+    private String username;
+    private String idUSP;
+    SessionManager sessionManager;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pinjam);
+        setContentView(R.layout.activity_profil);
 
-        SessionManager sessionManager = new SessionManager(getApplicationContext());
-        HashMap<String, String> user = sessionManager.getUserDetails();
-        String id_user1 = user.get(AppVar.ID_SHARED_PREF);
-
-        // Menginisiasi Toolbar dan mensetting sebagai actionbar
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
+
+
+        sessionManager = new SessionManager(getApplicationContext());
+        HashMap<String, String> user = sessionManager.getUserDetails();
+//        id_lala = user.get(AppVar.ID_SHARED_PREF);
+//        email = user.get(AppVar.EMAIL_SHARED_PREF);
+        username = user.get(AppVar.USERNAME_SHARED_PREF);
+        idUSP = user.get(AppVar.IDSP);
+
+        WebView view=(WebView) this.findViewById(R.id.webProfil);
+        view.getSettings().setJavaScriptEnabled(true);
+        view.setWebViewClient(new MyBrowser());
+        view.loadUrl("http://10.0.2.2/KAPER_SKARIGA/profil_user.php?no_induk="+idUSP);
         // Menginisiasi  NavigationView
-        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view1);
         //Mengatur Navigasi View Item yang akan dipanggil untuk menangani item klik menu navigasi
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             // This method will trigger on item Click of navigation menu
@@ -109,48 +109,34 @@ public class PinjamActivity extends AppCompatActivity {
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         //memanggil synstate
         actionBarDrawerToggle.syncState();
+    }
+    private class MyBrowser extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view,String Url)
+        {
+            view.loadUrl(Url);
+            return true;
+        }
+    }
+    private void Beranda(){
+        Intent intent = new Intent(Profil.this,MenuActivity.class);
+        startActivity(intent);
+        finish();
+    }
+    private void setprofil(){
+        Intent viewIntent = new Intent(Profil.this,Profil.class);
+        startActivity(viewIntent);
 
-        String url = "http://10.0.2.2/KAPER_SKARIGA_konek/getdata4.php?id="+id_user1;
-        lvhapee4 = (RecyclerView) findViewById(R.id.lvhape4);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        lvhapee4.setLayoutManager(llm);
-        requestQueue = Volley.newRequestQueue(PinjamActivity.this);
-        list_data4 = new ArrayList<HashMap<String, String>>();
-        stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d("response", response);
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
-                    JSONArray jsonArray = jsonObject.getJSONArray("pmnjm");
-                    for (int a = 0; a < jsonArray.length(); a++) {
-                        JSONObject json = jsonArray.getJSONObject(a);
-                        HashMap<String, String> map = new HashMap<String, String>();
-                        map.put("id", json.getString("id_user"));
-                        map.put("id2", json.getString("id_peminjaman"));
-                        map.put("id3", json.getString("id_detail_buku"));
-                        map.put("gambar", json.getString("gambar_buku"));
-                        map.put("judul",json.getString("judul_buku"));
-                        map.put("status_pinjam",json.getString("status_pinjaman"));
-                        list_data4.add(map);
-                        AdapterList5 adapter5 = new AdapterList5(PinjamActivity.this, list_data4);
-                        lvhapee4.setAdapter(adapter5);
-//                        Toast.makeText(PinjamActivity.this, "oyi", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-//                    Toast.makeText(MenuActivity.this, "lala", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(PinjamActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        requestQueue.add(stringRequest);
+    }
+    private void riwayat(){
+        Intent intent = new Intent(Profil.this, RiwayatActivity.class);
+        startActivity(intent);
+        finish();
+    }
+    private void Pesan(){
+        Intent intent = new Intent(Profil.this, PinjamActivity.class);
+        startActivity(intent);
+        finish();
     }
     private void logout() {
         //Creating an alert dialog to confirm logout
@@ -177,7 +163,7 @@ public class PinjamActivity extends AppCompatActivity {
 
 
                         //Starting login activity
-                        Intent intent = new Intent(PinjamActivity.this, LoginActivity.class);
+                        Intent intent = new Intent(Profil.this, LoginActivity.class);
                         startActivity(intent);
                         finish();
                     }
@@ -195,26 +181,5 @@ public class PinjamActivity extends AppCompatActivity {
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
 
-    }
-    private void Beranda(){
-        Intent intent = new Intent(PinjamActivity.this,MenuActivity.class);
-        startActivity(intent);
-        finish();
-    }
-    private void setprofil(){
-        Intent intent = new Intent(PinjamActivity.this, BuktiPesan.class);
-        startActivity(intent);
-        finish();
-    }
-    private void riwayat(){
-        Intent intent = new Intent(PinjamActivity.this,RiwayatActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    private void Pesan(){
-        Intent intent = new Intent(PinjamActivity.this, PinjamActivity.class);
-        startActivity(intent);
-        finish();
     }
 }

@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-public class ProfilActivity extends AppCompatActivity {
+public class BuktiPesan extends AppCompatActivity {
 
     //Mendefinisikan variabel
     private Toolbar toolbar;
@@ -25,7 +25,7 @@ public class ProfilActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profil);
+        setContentView(R.layout.bukti);
         // Menginisiasi Toolbar dan mensetting sebagai actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -87,22 +87,22 @@ public class ProfilActivity extends AppCompatActivity {
         actionBarDrawerToggle.syncState();
     }
     private void Beranda(){
-        Intent intent = new Intent(ProfilActivity.this,MenuActivity.class);
+        Intent intent = new Intent(BuktiPesan.this,MenuActivity.class);
         startActivity(intent);
         finish();
     }
     private void setprofil(){
-        Intent intent = new Intent(ProfilActivity.this, ProfilActivity.class);
+        Intent intent = new Intent(BuktiPesan.this, BuktiPesan.class);
         startActivity(intent);
         finish();
     }
     private void riwayat(){
-        Intent intent = new Intent(ProfilActivity.this,RiwayatActivity.class);
+        Intent intent = new Intent(BuktiPesan.this,RiwayatActivity.class);
         startActivity(intent);
         finish();
     }
     private void Pesan(){
-        Intent intent = new Intent(ProfilActivity.this, PinjamActivity.class);
+        Intent intent = new Intent(BuktiPesan.this, PinjamActivity.class);
         startActivity(intent);
         finish();
     }
@@ -131,7 +131,7 @@ public class ProfilActivity extends AppCompatActivity {
 
 
                         //Starting login activity
-                        Intent intent = new Intent(ProfilActivity.this, LoginActivity.class);
+                        Intent intent = new Intent(BuktiPesan.this, LoginActivity.class);
                         startActivity(intent);
                         finish();
                     }

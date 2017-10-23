@@ -5,4 +5,9 @@
     <color name="colorAccent">#000000</color>
     <color name="white">#ffffff</color>
 
+    <color name="refresh1">#1350e1</color>
+    <color name="refresh2">#0a91cf</color>
+    <color name="refresh3">#0dd9f4</color>
+
+
 </resources>

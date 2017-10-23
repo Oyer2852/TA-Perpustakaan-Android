@@ -1,21 +1,30 @@
 package com.example.destroyer.aplikasi_katalog_perpustakaan_smk_pgri_3;
 
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -24,6 +33,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,9 +41,18 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 public class MenuActivity extends AppCompatActivity {
 
+    MaterialSearchView searchView;
+    SessionManager sessionManager;
+    private TextView txtprofil;
+    private String username;
+    private TextView nametxt;
+    private TextView emailtxt;
+    private String idUSP;
     private RecyclerView lvhape;
     private RequestQueue requestQueue;
     private StringRequest stringRequest;
@@ -41,15 +60,113 @@ public class MenuActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     ArrayList<HashMap<String, String>> list_data;
+    private int position;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        // Menginisiasi Toolbar dan mensetting sebagai actionbar
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
+
+        searchView = (MaterialSearchView) findViewById(R.id.sv);
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+
+            }
+        });
+
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener(){
+            public boolean onQueryTextSubmit(String query){
+                return false;
+            }
+            public boolean onQueryTextChange(String search){
+                if(search != null && !search.isEmpty()){
+                    String url = "http://10.0.2.2/KAPER_SKARIGA_konek/getdata.php?id="+search;
+
+                    lvhape = (RecyclerView) findViewById(R.id.lvhape);
+                    LinearLayoutManager llm = new LinearLayoutManager(MenuActivity.this);
+                    llm.setOrientation(LinearLayoutManager.VERTICAL);
+                    lvhape.setLayoutManager(llm);
+                    requestQueue = Volley.newRequestQueue(MenuActivity.this);
+                    list_data = new ArrayList<HashMap<String, String>>();
+                    stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d("response", response);
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                JSONArray jsonArray = jsonObject.getJSONArray("buku_buku");
+                                for (int a = 0; a < jsonArray.length(); a++) {
+                                    JSONObject json = jsonArray.getJSONObject(a);
+                                    HashMap<String, String> map = new HashMap<String, String>();
+                                    map.put("id", json.getString("id_buku"));
+                                    map.put("judul", json.getString("judul_buku"));
+                                    map.put("gambar", json.getString("gambar_buku"));
+                                    map.put("sub",json.getString("subyek"));
+                                    map.put("stat",json.getString("status_buku"));
+                                    list_data.add(map);
+                                    AdapterList adapter = new AdapterList(MenuActivity.this, list_data);
+                                    lvhape.setAdapter(adapter);
+//                        Toast.makeText(MenuActivity.this, "oyi", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+//                    Toast.makeText(MenuActivity.this, "nop", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(MenuActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    requestQueue.add(stringRequest);
+                }
+                else{
+                    reload_data();
+                }
+                return true;
+            }
+        });
+
+
+
+
+        reload_data();
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.refresh1,R.color.refresh2,R.color.refresh3);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(true);
+                (new Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+                        reload_data();
+                    }
+                },500);
+            }
+        });
+
+
+        txtprofil = (TextView)findViewById(R.id.txtprofil);
+        // Menginisiasi Toolbar dan mensetting sebagai actionbar
+/*        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);*/
+
+
         // Menginisiasi  NavigationView
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         //Mengatur Navigasi View Item yang akan dipanggil untuk menangani item klik menu navigasi
@@ -107,13 +224,24 @@ public class MenuActivity extends AppCompatActivity {
         //memanggil synstate
         actionBarDrawerToggle.syncState();
 
+        sessionManager = new SessionManager(getApplicationContext());
+        HashMap<String, String> user = sessionManager.getUserDetails();
+//        id_lala = user.get(AppVar.ID_SHARED_PREF);
+//        email = user.get(AppVar.EMAIL_SHARED_PREF);
+        username = user.get(AppVar.USERNAME_SHARED_PREF);
+        idUSP = user.get(AppVar.IDSP);
+
+
+        txtprofil.setText("Selamat Datang "+ username +" di Aplikasi Katalog");
+
+    }
+    public void reload_data(){
         String url = "http://10.0.2.2/KAPER_SKARIGA_konek/getdata.php";
         lvhape = (RecyclerView) findViewById(R.id.lvhape);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         lvhape.setLayoutManager(llm);
         requestQueue = Volley.newRequestQueue(MenuActivity.this);
-
         list_data = new ArrayList<HashMap<String, String>>();
         stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
@@ -148,6 +276,12 @@ public class MenuActivity extends AppCompatActivity {
         });
 
         requestQueue.add(stringRequest);
+    }
+    public boolean onCreateOptionsMenu (Menu menu){
+        getMenuInflater().inflate(R.menu.menu_item,menu);
+        MenuItem item = menu.findItem(R.id.action_bar);
+        searchView.setMenuItem(item);
+        return  true;
     }
     private void logout() {
         //Creating an alert dialog to confirm logout
@@ -199,20 +333,15 @@ public class MenuActivity extends AppCompatActivity {
         finish();
     }
     private void setprofil(){
-        Intent intent = new Intent(MenuActivity.this, ProfilActivity.class);
-        startActivity(intent);
-        finish();
+        Intent viewIntent = new Intent(MenuActivity.this,Profil.class);
+        startActivity(viewIntent);
+
     }
     private void riwayat(){
-        Intent intent = new Intent(MenuActivity.this,RiwayatActivity.class);
+        Intent intent = new Intent(MenuActivity.this, RiwayatActivity.class);
         startActivity(intent);
         finish();
     }
-//    private void detail(){
-//        Intent intent = new Intent(MenuActivity.this, DetailActivity.class);
-//        startActivity(intent);
-//        finish();
-//    }
     private void Pesan(){
         Intent intent = new Intent(MenuActivity.this, PinjamActivity.class);
         startActivity(intent);

@@ -1,10 +1,13 @@
 package com.example.destroyer.aplikasi_katalog_perpustakaan_smk_pgri_3;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.content.SharedPreferences;
 import android.support.design.widget.NavigationView;
@@ -12,6 +15,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -22,43 +27,45 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
-public class DetailActivity2 extends AppCompatActivity implements View.OnClickListener{
+public class DetailActivity2 extends AppCompatActivity{
     //Mendefinisikan variabel
+    SessionManager sessionManager;
     private Toolbar toolbar;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
-    private EditText judul_buku;
-    private EditText editTextId;
+    private EditText judul_buku,IDSPPP,usernameText;
     private EditText jilid_buku;
     private EditText cetakan_buku;
     private EditText edisi_buku;
-    private EditText bahasa_buku;
     private ImageView imgbuku;
     private RecyclerView lvhape1;
     private RequestQueue requestQueue;
     private StringRequest stringRequest;
+    private ProgressDialog pDialog;
     ArrayList<HashMap<String, String>> list_data1;
-
+    private AppCompatButton buttonpesan;
     private Button pesan_buku;
-    private String id, gambar;
+    private String id, gambar, idLoginUser, idUSer,idUSer2,idDet,idUSP;
+    Context context;
+
+    private static final int NOTIFICATION_ID_OPEN_ACTIVITY = 9;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,33 +74,26 @@ public class DetailActivity2 extends AppCompatActivity implements View.OnClickLi
 
         Intent intent = getIntent();
         id = intent.getStringExtra("id_buku");
-//        gambar = intent.getStringExtra("gambar_buku");
-/*
-        editTextId = (EditText) findViewById(R.id.editTextId);
-*/
-        pesan_buku = (Button) findViewById(R.id.btnpesan);
+        idDet = intent.getStringExtra("id_detail_buku");
+
+        sessionManager = new SessionManager(getApplicationContext());
+        HashMap<String, String> user = sessionManager.getUserDetails();
+        idUSer = user.get(AppVar.ID_SHARED_PREF);
+        idUSer2 = user.get(AppVar.USERNAME_SHARED_PREF);
+        idUSP = user.get(AppVar.IDSP);
+
+//        sessionManager = new SessionManager(getApplicationContext());
+//        HashMap<String, String> user = sessionManager.getUserDetails();
+        sessionManager = new SessionManager(getApplicationContext());
         imgbuku = (ImageView) findViewById(R.id.imgbuku);
         judul_buku  = (EditText) findViewById(R.id.judul_buku);
         jilid_buku  = (EditText) findViewById(R.id.jilid_buku);
         cetakan_buku  = (EditText) findViewById(R.id.cetakan_buku);
         edisi_buku   = (EditText) findViewById(R.id.edisi_buku);
-//        bahasa_buku = (EditText) findViewById(R.id.bahasa_buku);
+        IDSPPP  = (EditText) findViewById(R.id.id_sp);
+        usernameText   = (EditText) findViewById(R.id.user_pesan);
 
-/*
-        Glide.with(context)
-                .load("http://10.0.2.2/KAPER_SKARIGA/img/book/" + gambar)
-                .crossFade()
-                .placeholder(R.mipmap.ic_launcher)
-                .into(holder.imgbuku);
-*/
-
-/*
-        judul_buku.setText(id);
-        editTextId.setText(id);
-*/
         getEmployee();
-
-
         // Menginisiasi Toolbar dan mensetting sebagai actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -128,7 +128,6 @@ public class DetailActivity2 extends AppCompatActivity implements View.OnClickLi
                     case R.id.navigation5:
                         logout();
                         return true;
-
                     default:
                         Toast.makeText(getApplicationContext(),"Kesalahan Terjadi ",Toast.LENGTH_SHORT).show();
                         return true;
@@ -173,6 +172,7 @@ public class DetailActivity2 extends AppCompatActivity implements View.OnClickLi
                         JSONObject json = jsonArray.getJSONObject(a);
                         HashMap<String, String> map = new HashMap<String, String>();
                         map.put("id", json.getString("id_buku"));
+                        map.put("judul",json.getString("judul_buku"));
                         map.put("kode",json.getString("kode_buku"));
                         map.put("stat",json.getString("status_buku"));
                         map.put("gambar",json.getString("gambar_buku"));
@@ -202,17 +202,12 @@ public class DetailActivity2 extends AppCompatActivity implements View.OnClickLi
         finish();
     }
     private void setprofil(){
-        Intent intent = new Intent(DetailActivity2.this, ProfilActivity.class);
+        Intent intent = new Intent(DetailActivity2.this, BuktiPesan.class);
         startActivity(intent);
         finish();
     }
     private void riwayat(){
         Intent intent = new Intent(DetailActivity2.this,RiwayatActivity.class);
-        startActivity(intent);
-        finish();
-    }
-    private void detail(){
-        Intent intent = new Intent(DetailActivity2.this, DetailActivity.class);
         startActivity(intent);
         finish();
     }
@@ -297,25 +292,137 @@ public class DetailActivity2 extends AppCompatActivity implements View.OnClickLi
             String cetak = c.getString(AppVar.TAG_CETAKAN);
             String edisi = c.getString(AppVar.TAG_EDISI);
 
-//                String bahasa= c.getString(AppVar.TAG_Bahasa);
 
-    /*
-                editTextId.setText(id);
-    */
+
             judul_buku.setText(judul);
             jilid_buku.setText(jilid);
             edisi_buku.setText(edisi);
             cetakan_buku.setText(cetak);
-//          bahasa_buku.setText(bahasa);
+            IDSPPP.setText(idUSer2);
+            usernameText.setText(idUSP);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    @Override
-    public void onClick(View v) {
+    public void kirimPesanan(View v)  {
+        String url = "http://10.0.2.2/KAPER_SKARIGA_konek/pesan.php?id_buku="+idDet+"&id_user="+idUSer;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //If we are getting success from server
 
+                        if(!response.contains("no")){
+                            NotificationCompat.Builder nc = new NotificationCompat.Builder(DetailActivity2.this);
+                            NotificationManager nm = (NotificationManager) DetailActivity2.this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                            Intent notifyIntent = new Intent(DetailActivity2.this,BuktiPesan.class);
+                            notifyIntent.putExtra("id_peminjaman","5");
+
+                            notifyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            PendingIntent pIntent = PendingIntent.getActivity(DetailActivity2.this,0,notifyIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+                            nc.setContentIntent(pIntent)
+                                    .setSmallIcon(R.mipmap.ic_launcher)
+                                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.book))
+                                    .setAutoCancel(true)
+                                    .setContentTitle(idUSer2+ " Melakukan Peminjaman");
+//                                .setContentText("Buku");
+
+                            nm.notify(NOTIFICATION_ID_OPEN_ACTIVITY, nc.build());
+
+                            gotoMenuActivity();
+
+                        } else {
+                            hideDialog();
+                            //Displaying an error message on toast
+                            Toast.makeText(context, "Username dan Password Salah", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //You can handle error here if you want
+                        hideDialog();
+                        Toast.makeText(DetailActivity2.this, "Cek URL Koneksi nya", Toast.LENGTH_LONG).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                //Adding parameters to request
+                params.put(AppVar.KEY_IDBUKU,id);
+                params.put(AppVar.KEY_IDUSER,idUSer);
+                //returning parameter
+                return params;
+            }
+        };
+
+        //Adding the string request to the queue
+        Volley.newRequestQueue(this).add(stringRequest);
+    }
+
+//    private void kirimPesanans(View v) {
+//        /*showDialog();
+//        //Creating a string request
+//        StringRequest stringRequest = new StringRequest(Request.Method.POST, AppVar.PESAN_URL,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        //If we are getting success from server
+//
+//                        if(!response.contains("no")){
+//                            sessionManager.createSession(response);
+//                            hideDialog();
+//                            gotoMenuActivity();
+//                        } else {
+//                            hideDialog();
+//                            //Displaying an error message on toast
+//                            Toast.makeText(context, "Username dan Password Salah", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        //You can handle error here if you want
+//                        hideDialog();
+//                        Toast.makeText(context, "Cek URL Koneksi nya", Toast.LENGTH_LONG).show();
+//                    }
+//                }) {
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<>();
+//                //Adding parameters to request
+//                params.put(AppVar.KEY_EMAIL,"id_buku");
+//                params.put(AppVar.KEY_PASSWORD, "kode_buku");
+//                //returning parameter
+//                return params;
+//            }
+//        };
+//
+//        //Adding the string request to the queue
+//        Volley.newRequestQueue(this).add(stringRequest);*/
+//
+//    }
+
+    private void gotoMenuActivity() {
+        Intent intent = new Intent(DetailActivity2.this, MenuActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void showDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    private void hideDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
     }
 
 }

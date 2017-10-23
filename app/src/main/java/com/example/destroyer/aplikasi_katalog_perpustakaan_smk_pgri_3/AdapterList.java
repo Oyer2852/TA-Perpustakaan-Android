@@ -9,12 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import android.support.design.widget.Snackbar;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -27,8 +24,6 @@ public class AdapterList extends RecyclerView.Adapter<AdapterList.ViewHolder> {
         this.context = menuActivity;
         this.list_data = list_data;
     }
-
-
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -54,6 +49,7 @@ public class AdapterList extends RecyclerView.Adapter<AdapterList.ViewHolder> {
                     case 0:
                         intent = new Intent(context, DetailActivity.class);
                         intent.putExtra("id_buku",list_data.get(position).get("id"));
+                        intent.putExtra("gambar_buku",list_data.get(position).get("gambar"));
                         break;
                     default:
                         intent = new Intent(context, MenuActivity.class);

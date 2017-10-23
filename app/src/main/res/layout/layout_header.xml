@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:padding="30dp"
-        android:src="@drawable/pro3"
+        android:src="@drawable/book"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="1dp"
@@ -38,6 +38,7 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"

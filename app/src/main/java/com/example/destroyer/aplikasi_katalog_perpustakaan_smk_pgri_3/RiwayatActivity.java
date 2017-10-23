@@ -10,22 +10,48 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RiwayatActivity extends AppCompatActivity {
 
     //Mendefinisikan variabel
     private Toolbar toolbar;
+    private RecyclerView lvhape3;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
+    private StringRequest stringRequest;
+    private RequestQueue requestQueue;
+    ArrayList<HashMap<String, String>> list_data3;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_riwayat);
+
+        SessionManager sessionManager = new SessionManager(getApplicationContext());
+        HashMap<String, String> user = sessionManager.getUserDetails();
+        String id_user = user.get(AppVar.ID_SHARED_PREF);
 
         // Menginisiasi Toolbar dan mensetting sebagai actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -87,6 +113,45 @@ public class RiwayatActivity extends AppCompatActivity {
         //memanggil synstate
         actionBarDrawerToggle.syncState();
 
+        String url = "http://10.0.2.2/KAPER_SKARIGA_konek/getdata3.php?id="+id_user;
+        lvhape3 = (RecyclerView) findViewById(R.id.lvhape3);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        lvhape3.setLayoutManager(llm);
+        requestQueue = Volley.newRequestQueue(RiwayatActivity.this);
+        list_data3 = new ArrayList<HashMap<String, String>>();
+        stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d("response", response);
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("rwyt");
+                    for (int a = 0; a < jsonArray.length(); a++) {
+                        JSONObject json = jsonArray.getJSONObject(a);
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        map.put("id", json.getString("id_user"));
+                        map.put("id2", json.getString("id_riwayat_kegiatan"));
+                        map.put("riwayat_keg",json.getString("riwayat_kegiatan"));
+                        map.put("tgl_keg",json.getString("tgl_riwayat_kegiatan"));
+                        list_data3.add(map);
+                        AdapterList4 adapter4 = new AdapterList4(RiwayatActivity.this, list_data3);
+                        lvhape3.setAdapter(adapter4);
+//                        Toast.makeText(MenuActivity.this, "oyi", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+//                    Toast.makeText(MenuActivity.this, "nop", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(RiwayatActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        requestQueue.add(stringRequest);
     }
     private void Beranda(){
         Intent intent = new Intent(RiwayatActivity.this,MenuActivity.class);
@@ -94,7 +159,7 @@ public class RiwayatActivity extends AppCompatActivity {
         finish();
     }
     private void setprofil(){
-        Intent intent = new Intent(RiwayatActivity.this, ProfilActivity.class);
+        Intent intent = new Intent(RiwayatActivity.this, BuktiPesan.class);
         startActivity(intent);
         finish();
     }

@@ -38,11 +38,14 @@ public class AdapterList2 extends RecyclerView.Adapter<AdapterList2.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final HashMap<String, String> name = list_data.get(position);
+/*
         Glide.with(context)
                 .load("http://10.0.2.2/KAPER_SKARIGA/img/book/" + list_data.get(position).get("gambar"))
                 .crossFade()
                 .placeholder(R.mipmap.ic_launcher)
                 .into(holder.imgbuku);
+*/
+        holder.imgbuku.setVisibility(View.GONE);
         holder.txtbuku.setText(list_data.get(position).get("kode"));
         holder.txtsub.setText(list_data.get(position).get("stat"));
         holder.cv.setOnClickListener(new View.OnClickListener() {
@@ -53,6 +56,7 @@ public class AdapterList2 extends RecyclerView.Adapter<AdapterList2.ViewHolder> 
                     case 0:
                         intent = new Intent(context, DetailActivity2.class);
                         intent.putExtra("id_buku",list_data.get(position).get("id"));
+                        intent.putExtra("id_detail_buku",list_data.get(position).get("id_detail_buku"));
                         break;
                     default:
                         intent = new Intent(context, MenuActivity.class);

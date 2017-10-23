@@ -6,86 +6,73 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".ProfilActivity">
+    tools:context=".LoginActivity">
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:measureWithLargestChild="false"
-        android:orientation="vertical"
-        android:weightSum="1">
-
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/layout_toolbar" />
-
-        <EditText
-            android:id="@+id/editTextnoinduk"
+        android:orientation="vertical">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/edittext_top_bg"
-            android:padding="20dp"
-            android:alpha="0.7"
-            android:hint="Nama"
-            android:fontFamily="monochrome"
-            android:textColorHint="#555555"
-            android:inputType="textPersonName"
-            android:textColor="@color/white"
-           />
-        <EditText
-            android:id="@+id/editTextnoinduk1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/edittext_top_bg"
-            android:padding="20dp"
-            android:alpha="0.7"
-            android:hint="Password"
-            android:fontFamily="monochrome"
-            android:textColorHint="#555555"
-            android:inputType="textPersonName"
-            android:textColor="@color/white"
-            />
+            android:layout_height="?attr/actionBarSize">
+            <android.support.v7.widget.Toolbar
+                android:layout_width="match_parent"
+                android:id="@+id/toolbar"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorPrimary"
+                />
+            <com.miguelcatalan.materialsearchview.MaterialSearchView
+                android:id="@+id/sv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:searchBackground="@color/colorPrimary"
+                app:searchSuggestionBackground="@color/colorPrimary"
+                app:searchCloseIcon="@drawable/clear"
+                app:searchBackIcon="@drawable/ic_back"
+                app:searchSuggestionIcon="@drawable/suggestion"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#FFFFFF"
+                />
+        </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/imgbuku"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:src="@mipmap/ic_launcher"
-            android:layout_weight="0.21" />
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/buttonbatal"
+        <!--<TextView-->
+            <!--android:id="@+id/txtprofil"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="center_horizontal"-->
+            <!--android:layout_marginBottom="5dp"-->
+            <!--android:layout_marginLeft="16dp"-->
+            <!--android:text="Selamat Datang"-->
+            <!--android:textAppearance="@style/TextAppearance.AppCompat.Body1"-->
+            <!--android:textStyle="bold" />-->
+        <WebView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:alpha="0.7"
-            android:background="@drawable/button_default_bg"
-            android:padding="3dp"
-            android:shadowColor="#FFFFFF"
-            android:shape="rectangle"
-            android:text="Cari Gambar"
-            android:textColor="@color/colorAccent"
-            android:textSize="23sp"
-            android:textStyle="bold" />
+            android:layout_height="match_parent"
+            android:id="@+id/webProfil"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/toolbar">
+        </WebView>
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/buttonbatal1"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:alpha="0.7"
-            android:background="@drawable/button_default_bg"
-            android:padding="3dp"
-            android:shadowColor="#929191"
-            android:shape="rectangle"
-            android:text="Ubah Profil"
-            android:textColor="@color/colorAccent"
-            android:textSize="23sp"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content">
+            <!--<android.support.v7.widget.RecyclerView-->
+                <!--android:id="@+id/lvhape"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_alignParentLeft="true"-->
+                <!--android:layout_alignParentStart="true"-->
+                <!--android:layout_alignParentTop="true" />-->
+        </android.support.v4.widget.SwipeRefreshLayout>
     </LinearLayout>
 
     <android.support.design.widget.NavigationView
-        android:id="@+id/navigation_view"
+        android:id="@+id/navigation_view1"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"

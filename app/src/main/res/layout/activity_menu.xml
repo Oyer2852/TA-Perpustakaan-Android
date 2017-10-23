@@ -14,11 +14,45 @@
         android:layout_height="match_parent"
         android:measureWithLargestChild="false"
         android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+            <android.support.v7.widget.Toolbar
+                android:layout_width="match_parent"
+                android:id="@+id/toolbar"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorPrimary"
+                />
+            <com.miguelcatalan.materialsearchview.MaterialSearchView
+                android:id="@+id/sv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:searchBackground="@color/colorPrimary"
+                app:searchSuggestionBackground="@color/colorPrimary"
+                app:searchCloseIcon="@drawable/clear"
+                app:searchBackIcon="@drawable/ic_back"
+                app:searchSuggestionIcon="@drawable/suggestion"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#FFFFFF"
+                />
+        </RelativeLayout>
 
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/layout_toolbar" />
 
+        <TextView
+            android:id="@+id/txtprofil"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="16dp"
+            android:text="Selamat Datang"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textStyle="bold" />
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lvhape"
             android:layout_width="match_parent"
@@ -26,6 +60,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true" />
+        </android.support.v4.widget.SwipeRefreshLayout>
     </LinearLayout>
 
     <android.support.design.widget.NavigationView
